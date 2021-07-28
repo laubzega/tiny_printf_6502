@@ -40,7 +40,7 @@ text	.byte "Hello Underworld", 0
 
 ### I'm tentatively interested, please elaborate.
 
-```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) that during assembly builds a compact data structure containing the string with optional formatting tags, and the arguments, and also inserts a call to ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 700 bytes with all options enabled, but is very configurable and depending on the features you need, it can tuned down to ~200 bytes. Additionally, care has been taken to keep to number of bytes taken by each call to a minimum - it is equal to:
+```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) that during assembly builds a compact data structure containing the string with optional formatting tags, and the arguments, and also inserts a call to function ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 700 bytes with all options enabled, but is very configurable and depending on the features you need, it can be tuned down to ~200 bytes. Additionally, care has been taken to keep to number of bytes taken by each call to a minimum - it is equal to:
 
 length_of_the_string + 1 (trailing null) + number_of_args * 2 + 1 + 6 (preserving and restoring registers X and A) + 7 (loading a pointer and then jump to a subroutine)
 
@@ -119,7 +119,7 @@ will output ```Bye Bye```.
 
 ## Register arguments
 
-You have already seen this above - prefix ```^``` is used in front of argument name to indicate it is a register. Registers X, Y, A, PC and P (status) are recognized. For example:
+You have already seen this above - prefix ```^``` is used in front of argument name to indicate it refers to a register. Registers X, Y, A, PC and P (status) are recognized. For example:
 ```asm
 	; assuming the code starts at $c000
 	lda #$c0
@@ -127,7 +127,8 @@ You have already seen this above - prefix ```^``` is used in front of argument n
 	ldy #$64
 	printf "A:$%02X X:$%02X Y:$%02X at $%04lX", ^A, ^X, ^Y, ^PC
 ```
-will produce ```A:$C0 X:$DE Y:64 at $C00C```.
+will produce ```A:$C0 X:$DE Y:$64 at $C00C```.
+
 
 ## Other differences from C printf()
 
