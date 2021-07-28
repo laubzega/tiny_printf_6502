@@ -80,7 +80,7 @@ outputs ```0100_0000```.
 
 The assembler macro does not share the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers (this is probably the largest departure from C printf(), but one that makes sense from the viewpoint of assembly programmer).
 
-By default, arguments are considered to be byte-sized. So 
+By default, arguments are assumed to be byte-sized. So 
 ```asm
 	printf "%x", val
 	rts
@@ -108,13 +108,26 @@ produces ```18 13330 5649426 2018915346```.
 
 No more than three ```l``` modifiers are allowed, meaning that numbers up to 32-bit are supported.
 
-Another 6502-specific modifier is ```p```. It assumes that the corresponding argument is a 16-bit pointer, and outputs the value the pointer references. So:
+Another 6502-specific modifier is ```p```. It assumes that the corresponding argument is a 16-bit pointer, and outputs the value that the pointer references. So:
 ```asm
 	printf "%s %ps", text, ptr
 text:	.byte "Bye", 0
 ptr:	.word text
 ```
 will output ```Bye Bye```.
+
+
+## Register arguments
+
+You have already seen this above - prefix ```^``` is used in front of argument name to indicate it is a register. Registers X, Y, A, PC and P (status) are recognized. For example:
+```asm
+	; assuming the code starts at $c000
+	lda #$c0
+	ldx #$de
+	ldy #$64
+	printf "A:$%02X X:$%02X Y:$%02X at $%04lX", ^A, ^X, ^Y, ^PC
+```
+will produce ```A:$C0 X:$DE Y:64 at $C00C```.
 
 ## Other differences from C printf()
 
