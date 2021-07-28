@@ -49,7 +49,7 @@ By default ```printf``` preserves the contents of all registers. If you don't ne
 
 ### But where does it print?
 
-Glad you asked. Your code is expected to define a macro called OUTPUT_CHAR, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling CHROUT on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+Glad you asked. Your code is expected to define a macro called ```OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
 
 ### Is it like full printf, with floats, and precision, and a pony?
 
@@ -64,7 +64,7 @@ Not really, but the list of supported format specifiers is quite comprehensive:
 * \\%, \\\\ - escaping special characters
 * \xNN - hexadecimal literals
 
-There are also modifiers:
+There are also some useful modifiers:
 
 * %0N will make decimal and hex numbers N digits long, adding leading zeros where necessary, i.e.
 ```asm
@@ -134,9 +134,19 @@ You have already seen this above - prefix ```^``` is used in front of argument n
 ```
 will produce ```A:$C0 X:$DE Y:$64 at $C00C```.
 
+But there is another way to use registers. 6502 programmers often pass pointers using a pair of 8-bit registers. To see what such pointer refers to, simply use
+```asm
+	ldx #<text
+	lda #>text
+	printf "A=$%02x, X=$%02x, AX points to %s", ^A, ^X, ^AX
+	rts
+text:	.byte "Blah", 0
+```
+which would output ```A=$c0, X=$c020,  AX points to Blah``` (assuming that ```text``` is at ```$c020```).
+
 
 ## Other differences from C printf()
 
-* In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit numbers of leading zeros and spaces, so this may change.
+* In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit counts of leading zeros and spaces, so this may change.
 * No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it detected problems.
 * No support for negative numbers.
