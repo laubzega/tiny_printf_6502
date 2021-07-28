@@ -83,7 +83,7 @@ outputs ```0100_0000```.
 
 ## Argument sizes
 
-The assembler macro does not share the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers (this is probably the largest departure from C printf(), but one that makes sense from the viewpoint of assembly programmer).
+The assembler macro does not share the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers. By the way, this is probably the largest departure from C printf(), but one that makes sense from the viewpoint of assembly programmer. It takes some getting used to, so if you are seeing results way different than expected, your size modifiers are the first thing to check.
 
 By default, arguments are assumed to be byte-sized. So 
 ```asm
@@ -139,4 +139,4 @@ will produce ```A:$C0 X:$DE Y:$64 at $C00C```.
 
 * In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit numbers of leading zeros and spaces, so this may change.
 * No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it detected problems.
-* 
+* No support for negative numbers.
