@@ -80,10 +80,30 @@ outputs ```0100_0000```.
 
 The assembler macro does not have the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers.
 
-By default, arguments are considered to be a byte value. So 
+By default, arguments are considered to be byte-sized. So 
 ```asm
-	printf "%x\n", value
+	printf "%x\n", val
 	rts
-value:	.dbyte $12345678
+val:	.byte $12, $34, $56, $78
 ```
-will output ```12```, because this is the first byte following the label ```value```.
+will output ```12```, because this is the value of the first byte following the label ```value```. To increase the magnitude of our number we can use modified ```l```, so
+```asm
+	printf "%lx\n", val
+```
+will output ```3412```, because now two bytes are being considered, using 6502's little-endian order.
+```asm
+	printf "%llx\n", val
+```
+makes it a 24-bit operation and yields ```563412", and finally
+```asm
+	printf "%lllx\n", val
+```
+uses all 32-bits: ```78563412```.
+
+Same is true for decimal numbers, so
+```asm
+	printf "%d %ld %lld %llld\n", val, val, val, val
+```
+produces ```18 13330 5649426 2018915346```.
+
+No more than three ```l``` modifiers are allowed, meaning that numbers up to 32-bit are supported.
