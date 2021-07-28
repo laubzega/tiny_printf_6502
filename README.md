@@ -49,7 +49,7 @@ By default ```printf``` preserves the contents of all registers. If you don't ne
 
 ### But where does it print?
 
-Glad you asked. Your code is expected to define a macro called OUTPUT_CHAR, which will be executed repeatedly as ```_printf``` is generating successive characters of the resulting string. The macro receives that character in the accumulator and can output it to the screen directly (e.g. by calling CHROUT on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()).
+Glad you asked. Your code is expected to define a macro called OUTPUT_CHAR, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling CHROUT on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
 
 ### Is it like full printf, with floats, and precision, and a pony?
 
