@@ -1,9 +1,9 @@
 # tiny_printf_6502
 
-### How may I help you?
+### What's going on here?
 
 If you ever wanted to (s)printf things in assembly as effortlessly as can be done in C,
-you came to the right place. This ca65 macro/library combination
+you've come to the right place. This ca65 macro/library combination
 lets you do things like
 
 ```asm
@@ -35,16 +35,21 @@ and that, too:
 	sta ptr + 1
 	printf "Pointer at $%04lx, pointing to $%04lx, which is %ps\n", &ptr, ptr, ptr
 	rts
-text	.byte "Hello Underworld", 0
+text:	.byte "Hello Underworld", 0
 ```
 
 ### I'm tentatively interested, please elaborate.
 
-```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) that during assembly builds a compact data structure containing the string with optional formatting tags, and the arguments, and also inserts a call to function ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 700 bytes with all options enabled, but is very configurable and depending on the features you need, it can be tuned down to ~200 bytes. Additionally, care has been taken to keep to number of bytes taken by each call to a minimum - it is equal to:
+```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) which during assembly builds a compact data structure containing the string with optional formatting tags and their corresponding arguments, and also inserts a call to function ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 700 bytes with all options enabled, but is very configurable and depending on the features you need, it can be trimmed down to ~200 bytes. Additionally, care has been taken to keep the number of bytes taken by each call to a minimum - it is equal to:
 
 length_of_the_string + 1 (trailing null) + number_of_args * 2 + 1 + 6 (preserving and restoring registers X and A) + 7 (loading a pointer and then jump to a subroutine)
 
-By default ```printf``` preserves the contents of all registers. If you don't need it and want to save some space, you can either disable it globally or use ```printq``` that only preserves Y.
+By default ```printf``` preserves the contents of all registers. If you don't need this and want to save some space, you can either disable it globally or use ```printq``` that only preserves Y, saving 6 bytes on each call.
+
+
+### But where does it print?
+
+Glad you asked. Your code is expected to define a macro called OUTPUT_CHAR, which will be executed repeatedly as ```_printf``` is generating successive characters of the resulting string. The macro receives that character in the accumulator and can output it to the screen directly (e.g. by calling CHROUT on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()).
 
 ### Is it like full printf, with floats, and precision, and a pony?
 
