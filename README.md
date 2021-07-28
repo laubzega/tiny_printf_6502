@@ -124,7 +124,7 @@ will output ```Bye Bye```.
 
 ## Register arguments
 
-You have already seen this above - prefix ```^``` is used in front of argument name to indicate it refers to a register. Registers X, Y, A, PC and P (status) are recognized. For example:
+You have already seen this above - prefix ```^``` used in front of argument name indicates that it refers to a register. Registers X, Y, A, PC and P (status) are recognized. For example:
 ```asm
 	; assuming the code starts at $c000
 	lda #$c0
@@ -142,7 +142,9 @@ But there is another way to use registers. 6502 programmers often pass pointers 
 	rts
 text:	.byte "Blah", 0
 ```
-which would output ```A=$c0, X=$c020,  AX points to Blah``` (assuming that ```text``` is at ```$c020```).
+which would output ```A=$c0, X=$20,  AX points to Blah``` (assuming that ```text``` is at ```$c020```).
+
+Note that the high byte is assumed to be in the leftmost register. 
 
 
 ## Other differences from C printf()
