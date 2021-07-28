@@ -76,34 +76,48 @@ outputs ```064```.
 ```
 outputs ```0100_0000```.	
 
-# Argument sizes and other differences from C printf()
+## Argument sizes
 
-The assembler macro does not have the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers.
+The assembler macro does not share the compiler's luxury of knowing argument types. We thus have to take over this responsiblity and provide necessary information about argument sizes in the format specifiers (this is probably the largest departure from C printf(), but one that makes sense from the viewpoint of assembly programmer).
 
 By default, arguments are considered to be byte-sized. So 
 ```asm
-	printf "%x\n", val
+	printf "%x", val
 	rts
 val:	.byte $12, $34, $56, $78
 ```
-will output ```12```, because this is the value of the first byte following the label ```value```. To increase the magnitude of our number we can use modified ```l```, so
+will output ```12```, because this is the value of the first byte following the label ```val```. To increase the magnitude of our number we can apply modifier ```l```, so
 ```asm
-	printf "%lx\n", val
+	printf "%lx", val
 ```
-will output ```3412```, because now two bytes are being considered, using 6502's little-endian order.
+will output ```3412```, because now two bytes are being considered (in 6502's little-endian order).
 ```asm
-	printf "%llx\n", val
+	printf "%llx", val
 ```
-makes it a 24-bit operation and yields ```563412", and finally
+makes it a 24-bit operation and yields ```563412```, and finally
 ```asm
-	printf "%lllx\n", val
+	printf "%lllx", val
 ```
 uses all 32-bits: ```78563412```.
 
 Same is true for decimal numbers, so
 ```asm
-	printf "%d %ld %lld %llld\n", val, val, val, val
+	printf "%d %ld %lld %llld", val, val, val, val
 ```
 produces ```18 13330 5649426 2018915346```.
 
 No more than three ```l``` modifiers are allowed, meaning that numbers up to 32-bit are supported.
+
+Another 6502-specific modifier is ```p```. It assumes that the corresponding argument is a 16-bit pointer, and outputs the value the pointer references. So:
+```asm
+	printf "%s %ps", text, ptr
+text:	.byte "Bye", 0
+ptr:	.word text
+```
+will output ```Bye Bye```.
+
+## Other differences from C printf()
+
+* In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit numbers of leading zeros and spaces, so this may change.
+* No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it detected problems.
+* 
