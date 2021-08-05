@@ -2,41 +2,51 @@
 
 ### What's going on here?
 
-If you ever wanted to (s)printf things in assembly as effortlessly as can be done in C,
+If you ever wanted to ```printf``` things in assembly as effortlessly as can be done in C,
 you've come to the right place. This ca65 macro/library combination
 lets you do things like
 
 ```asm
 	lda #42
 	sta value
-	printf "8-bit value: %02x at %04lx\n", value, &value
+	printf "8-bit value: %02d at %04ld\n", value, &value
 	rts
 value:	.byte 0
 ```
-and also
+Output: ```8-bit value: 42 at 3163```.
+
+Or like that
 ```asm
 	printf "$%X = %d dec\n", value, value
 ```
-and even
+Output: ```$2A = 42 dec```.
 
-```asm
-	ldx #0
-loop:	printf "Content of register X is $%02x\n", ^X
-	dex
-	bne loop
-```
-
-and that, too:
-
+And even
 ```asm
 	lda #<text
 	sta ptr
 	lda #>text
 	sta ptr + 1
-	printf "Pointer at $%04lx, pointing to $%04lx, which is %ps\n", &ptr, ptr, ptr
+	printf "Pointer at $%04lx, pointing to string at $%04lx, which is \'%ps\'.\n", &ptr, ptr, ptr
 	rts
-text:	.byte "Hello Underworld", 0
+text:	.byte "Hello, Underworld", 0
 ```
+Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.```
+
+And that, too:
+```asm
+	ldx #2
+loop:	printf "Content of register X is $%02x\n", ^X
+	dex
+	bpl loop
+```
+Output:
+```
+Content of register X is $02
+Content of register X is $01
+Content of register X is $00
+```
+
 
 ### I'm tentatively interested, please elaborate.
 
@@ -47,9 +57,11 @@ length_of_the_string + 1 (trailing null) + number_of_args * 2 + 1 + 6 (preservin
 By default ```printf``` preserves the contents of all registers. If you don't need this and want to save some space, you can either disable it globally or use ```printq``` that only preserves Y, saving 6 bytes on each call.
 
 
-### But where does it print?
+### But where to does it print?
 
-Glad you asked. Your code is expected to define a macro called ```OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+
+Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every line. See example2/ for a practical application.
 
 ### Is it like full printf, with floats, and precision, and a pony?
 
