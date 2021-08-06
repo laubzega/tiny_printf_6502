@@ -17,7 +17,7 @@ producing this output: ```8-bit value: 42 at 3163```. Or like that
 ```asm
 	printf "$%X = %d dec\n", value, value
 ```
-Output: ```$2A = 42 dec```. This also is possible:
+outputting: ```$2A = 42 dec```. Also this is possible:
 ```asm
 	lda #<text
 	sta ptr
@@ -27,14 +27,14 @@ Output: ```$2A = 42 dec```. This also is possible:
 	rts
 text:	.byte "Hello, Underworld", 0
 ```
-Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.``` And that, too:
+Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.``` Finally,
 ```asm
 	ldx #2
 loop:	printf "Content of register X is $%02x\n", ^X
 	dex
 	bpl loop
 ```
-Output:
+will yield:
 ```
 Content of register X is $02
 Content of register X is $01
@@ -59,22 +59,23 @@ Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_
 
 Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every call. Again, see example2/ for a practical application.
 
+
 ## Seems cool, how do I use it?
 
 * Make sure that your linker config has CODE, ZEROPAGE, DATA and RODATA segments.
 * Define PRINTF_OUTPUT_CHAR macro and make it visible in tiny_printf.s
 * Optionally define PRINTF_INIT
 * Make your code include tiny_printf.i (for macros)
-* Adjust configuration options in tiny_printf.s (unless you need want everything, which is the default)
+* Adjust configuration options in tiny_printf.s (unless you want everything, which is the default)
 * Assemble tiny_printf.s and link it with your code. No point making it into a library, it's just one function.
-* Commence printfing. All your printf calls should be done from CODE segment.
+* Commence printfing. All your printf calls should be done from the CODE segment.
 
-As usual, included examples are your best friends. Refer to them for build setup, macro definitions and usage examples.
+As usual, included examples are your best friends. Refer to them for build setup, macro definitions, and usage examples.
 
 
-### Is it like full printf, with floats, and precision, and a pony?
+## Is it like full printf, with floats, and precision, and a pony?
 
-Not really, but the list of supported format specifiers is quite comprehensive:
+Not really, but the list of supported format specifiers is quite extensive:
 
 * %d - decimal numbers
 * %x - hexadecimal numbers (%X - also uppercase)
@@ -172,11 +173,11 @@ Note that the high byte is expected to be in the leftmost register.
 * In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit counts of leading zeros and spaces, so this may change.
 * No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it encountered problems.
 * There is currently no support for negative numbers.
-* The code is not reentrant. Using it concurrently from interrupt context (or by more than one process) will lead to undefined (but surely unpleasant) behavior.
+* The code is not reentrant. Using it concurrently from interrupt context (or by more than one process) will lead to undefined (but certainly unpleasant) behavior.
 
 ## Memory use
 
-The table belows shows the effects of various configuration options on the size of the resulting binary. While some effort has been spent keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
+The table below shows the effects of various configuration options on the size of the resulting binary. While some effort has been spent keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
 
 Configuration | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
 :---| :---: | :---:
@@ -198,7 +199,9 @@ When building for systems with available zero page locations, 26 bytes are moved
 
 ## Wait, has it been tested?!
 
-There is some 50+ tests being run using sim6502 from cc65 whenever you type make. See test/ for details.
+There are some 50+ tests being run (using sim6502 from cc65) whenever you type make. See test/ for details.
+
+The code is also heavily used in a project I'm currently working on.
 
 ## Great, no bugs then!
 
