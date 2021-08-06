@@ -164,3 +164,24 @@ Note that the high byte is assumed to be in the leftmost register.
 * In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit counts of leading zeros and spaces, so this may change.
 * No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it detected problems.
 * No support for negative numbers.
+
+## Memory use
+
+The table belows shows the effects that various configuration options have on the size of the binary.
+
+Configuration | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
+:---| :---: | :---:
+Base | 241 | 241
+ARG_HEX | 122 | 363
+ARG_DECIMAL | 168 | 409
+ARG_BINARY | 71 | 312
+ARG_STRING | 25 | 266
+ARG_CHAR | 20 | 261
+ARG_HEX + ARG_LEADING_ZEROS | 250 | 491
+ARG_DECIMAL + ARG_LEADING_ZEROS | 298 | 539
+ARG_PTR | 32| 273
+ESCAPED_HEX_LITERALS | 63 | 304
+PRESERVE_REGS | 4 | 245
+All options - ARG_LEADING_ZEROS | 496| 737
+All options | 644| 885
+
