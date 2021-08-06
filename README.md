@@ -13,15 +13,11 @@ lets you do things like
 	rts
 value:	.byte 0
 ```
-Output: ```8-bit value: 42 at 3163```.
-
-Or like that
+producing this output: ```8-bit value: 42 at 3163```. Or like that
 ```asm
 	printf "$%X = %d dec\n", value, value
 ```
-Output: ```$2A = 42 dec```.
-
-And even
+Output: ```$2A = 42 dec```. This also is possible:
 ```asm
 	lda #<text
 	sta ptr
@@ -31,9 +27,7 @@ And even
 	rts
 text:	.byte "Hello, Underworld", 0
 ```
-Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.```
-
-And that, too:
+Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.``` And that, too:
 ```asm
 	ldx #2
 loop:	printf "Content of register X is $%02x\n", ^X
@@ -50,18 +44,20 @@ Content of register X is $00
 
 ### I'm tentatively interested, please elaborate.
 
-```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) which during assembly builds a compact data structure containing the string with optional formatting tags and their corresponding arguments, and also inserts a call to function ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 700 bytes with all options enabled, but is very configurable and depending on the features you need, it can be trimmed down to ~200 bytes. Additionally, care has been taken to keep the number of bytes taken by each call to a minimum - it is equal to:
+```printf``` is a macro for ca65 (part of https://github.com/cc65/cc65) which during assembly builds a compact data structure containing the string with optional formatting tags and their corresponding arguments, and also inserts a call to function ```_printf```. The data structure is then consumed at run-time by ```_printf```, which parses the string, inserts appropriately formatted arguments and produces the output. Function ```_printf``` is around 900 bytes with all bells and whistles enabled, but is very configurable and depending on the features you need, it can be trimmed down to ~250 bytes. Additionally, care has been taken to keep the number of bytes taken by each call to a minimum - it is approximately equal to:
 
-length_of_the_string + 1 (trailing null) + number_of_args * 2 + 1 + 6 (preserving and restoring registers X and A) + 7 (loading a pointer and then jump to a subroutine)
+length_of_the_string + 1 (trailing null) + number_of_args * 2 + 1 + 6 (preserving and restoring registers X and A) + 7 (loading a pointer and then a jump to a subroutine)
 
 By default ```printf``` preserves the contents of all registers. If you don't need this and want to save some space, you can either disable it globally or use ```printq``` that only preserves Y, saving 6 bytes on each call.
 
+The code is ROMable, but not reentrant.
 
-### But where to does it print?
 
-Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is generating successive characters of the result string. The macro receives each character in the accumulator and can output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+### But where does it print to?
 
-Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every line. See example2/ for a practical application.
+Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is producing successive characters of the result string. The macro is handed each character in the accumulator and may output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+
+Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every call. Again, see example2/ for a practical application.
 
 ### Is it like full printf, with floats, and precision, and a pony?
 
@@ -136,9 +132,8 @@ will output ```Bye Bye```.
 
 ## Register arguments
 
-You have already seen this above - prefix ```^``` used in front of argument name indicates that it refers to a register. Registers X, Y, A, PC and P (status) are recognized. For example:
+You have already seen this above - prefix ```^``` used in front of an argument name indicates that it refers to a register. Registers X, Y, A, PC and P (status) are recognized. For example:
 ```asm
-	; assuming the code starts at $c000
 	lda #$c0
 	ldx #$de
 	ldy #$64
@@ -146,7 +141,7 @@ You have already seen this above - prefix ```^``` used in front of argument name
 ```
 will produce ```A:$C0 X:$DE Y:$64 at $C00C```.
 
-But there is another way to use registers. 6502 programmers often pass pointers using a pair of 8-bit registers. To see what such pointer refers to, simply use
+There is also another way of using the registers. 6502 programmers often pass pointers using a pair of 8-bit registers. To see what such pointer refers to, simply use
 ```asm
 	ldx #<text
 	lda #>text
@@ -156,18 +151,19 @@ text:	.byte "Blah", 0
 ```
 which would output ```A=$c0, X=$20,  AX points to Blah``` (assuming that ```text``` is at ```$c020```).
 
-Note that the high byte is assumed to be in the leftmost register. 
+Note that the high byte is expected to be in the leftmost register. 
 
 
-## Other differences from C printf()
+## Other limitations and differences from C printf()
 
 * In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit counts of leading zeros and spaces, so this may change.
-* No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it detected problems.
-* No support for negative numbers.
+* No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it encountered problems.
+* There is currently no support for negative numbers.
+* The code is not reentrant. Using it concurrently from interrupt context (or by more than one process) will lead to undefined (but surely unpleasant) behavior.
 
 ## Memory use
 
-The table belows shows the effects that various configuration options have on the size of the binary.
+The table belows shows the effects of various configuration options on the size of the resulting binary. While some effort has been spent keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
 
 Configuration | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
 :---| :---: | :---:
@@ -185,4 +181,4 @@ PRESERVE_REGS | 4 | 245
 All options - ARG_LEADING_ZEROS | 496| 737
 All options | 644| 885
 
-When building for systems with available zero page locations, 26 bytes are moved from "DATA" to "ZEROPAGE" segment, further reducing the total size.
+When building for systems with available zero page locations, 26 bytes are moved from "DATA" to "ZEROPAGE" segment, further reducing the total size. Otherwise just three pointers (6 bytes) on the zeropage are required.
