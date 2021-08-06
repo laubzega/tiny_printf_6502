@@ -180,7 +180,7 @@ Note that the high byte is expected to be in the leftmost register.
 
 ## Memory use
 
-The table below shows the effects of various configuration options on the size of the resulting binary. While some effort has been spent keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
+The table below shows the effects of various configuration options on the size of the resulting binary. While some effort has been invested into keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
 
 Configuration | Available args | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
 :---| :---: | :---: | :---:
@@ -202,7 +202,7 @@ When building for systems with available zero page locations, 26 bytes are moved
 
 ## Wait, has it been tested?!
 
-There are some 50+ tests being run (using sim6502 from cc65) whenever you type make. See test/ for details.
+There are some 50+ tests being run (using sim65 from cc65) whenever you type make. See test/ for details.
 
 The code is also heavily used in a project I'm currently working on.
 
