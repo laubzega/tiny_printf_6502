@@ -56,9 +56,9 @@ The code is ROMable, but not reentrant.
 
 ### But where does it print to?
 
-Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is producing successive characters of the result string. The macro is handed each character in the accumulator and may output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See example2/ for inspiration and remember that the macro is expected to preserve registers A, X and Y.
+Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_CHAR```, which will be executed repeatedly as ```_printf``` is producing successive characters of the result string. The macro is handed each character in the accumulator and may output it to the screen directly (e.g. by calling ```CHROUT``` on the C64), send it over UART, or perform more sophisticated actions (like controlling output size to e.g. emulate snprintf()). See [example2/](example2/) for inspiration and remember that the macro is expected to preserve registers A, X and Y.
 
-Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every call. Again, see example2/ for a practical application.
+Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every call. Again, see [example2/](example2/) for a practical application.
 
 
 ## Seems cool, how do I use it?
@@ -202,7 +202,7 @@ When building for systems with available zero page locations, 26 bytes are moved
 
 ## Wait, has it been tested?!
 
-There are some 50+ tests being run (using sim65 from cc65) whenever you type make. See test/ for details.
+There are some 50+ tests being run (using sim65 from cc65) whenever you type make. See [test/](test/) for details.
 
 The code is also heavily used in a project I'm currently working on.
 
