@@ -205,6 +205,6 @@ There are some 50+ tests being run (using sim6502 from cc65) whenever you type m
 
 The code is also heavily used in a project I'm currently working on.
 
-## Great, no bugs then!
+### Great, no bugs then!
 
 lol
