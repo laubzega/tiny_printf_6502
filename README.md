@@ -83,7 +83,7 @@ Not really, but the list of supported format specifiers is quite extensive:
 * %c - single characters
 * %s - strings
 * \n - new lines
-* \\%, \\\\ - escaping special characters
+* \\%, \\\\ - escaped special characters
 * \xNN - hexadecimal literals
 
 There are also some useful modifiers:
