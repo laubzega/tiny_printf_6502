@@ -73,26 +73,26 @@ _printf:
         lda $102,x
         sta _printf_register_pc + 1
 
-.if .definedmacro(PRINTF_INIT)
-        PRINTF_INIT
-.endif
 .ifdef _TINYPRINTF_PRESERVE_REGS
         tya
         pha
 .endif
+.if .definedmacro(PRINTF_INIT)
+        PRINTF_INIT
+.endif
 
-        ldy #_PRINTF_MODE_NORMAL
+        ldy #_PRINTF_MODE_NORMAL    ; which is 0.
+        sty _printf_arg_idx
         sty _printf_mode
+
         ; compute the start of argument data
         lda (_printf_str),y
         clc
         adc _printf_str
         sta _printf_args
-        lda #0
+        tya
         adc _printf_str + 1
         sta _printf_args + 1
-
-        sty _printf_arg_idx
 
 inc_string_loop:
         iny
@@ -118,9 +118,6 @@ not_end:
         bcc @not_zero_count
 
         jmp inc_string_loop     ; always taken
-
-;@not_a_digit:
-;        jmp error
 .endif
 
 @not_zero_count:
