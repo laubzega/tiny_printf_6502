@@ -55,10 +55,15 @@ _printf_tmp:    .res 1
 _printf_bin:        .res 4
 _printf_bcd:        .res 5
 .endif
-
-_printf_str = 250
-_printf_args = 252
-_printf_src = 254
+.ifndef __C64__
+_printf_str:        .res 2
+_printf_args:       .res 2
+_printf_src:        .res 2
+.else
+_printf_str = 78    ; should be safe to use in this context
+_printf_args = 251
+_printf_src = 253
+.endif
 
 
         .segment "DATA"
