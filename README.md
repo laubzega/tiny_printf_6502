@@ -173,27 +173,29 @@ Note that the high byte is expected to be in the leftmost register.
 * In ```%0N``` and ```%N```, N can only be a single digit. I'm still weighting this limitation against the size of extra code needed to support multi-digit counts of leading zeros and spaces, so this may change.
 * No exhaustive validation of format specifiers and their modifiers is performed (again for code size reasons). Some validation is done though, ```printf``` will terminate and output ```ERR``` in place where it encountered problems.
 * There is currently no support for negative numbers.
+* Maximum length of a string is 255 bytes.
+* Maximum number of arguments is 14.
 * The code is not reentrant. Using it concurrently from interrupt context (or by more than one process) will lead to undefined (but certainly unpleasant) behavior.
 
 ## Memory use
 
 The table below shows the effects of various configuration options on the size of the resulting binary. While some effort has been spent keeping the code small, I am pretty sure a few bytes can be shaved off here and there.
 
-Configuration | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
-:---| :---: | :---:
-Base (minimal usable) | 241 | 241
-ARG_HEX | 122 | 363
-ARG_DECIMAL | 168 | 409
-ARG_BINARY | 71 | 312
-ARG_STRING | 25 | 266
-ARG_CHAR | 20 | 261
-ARG_HEX + ARG_LEADING_ZEROS | 250 | 491
-ARG_DECIMAL + ARG_LEADING_ZEROS | 298 | 539
-ARG_PTR | 32| 273
-ESCAPED_HEX_LITERALS | 63 | 304
-PRESERVE_REGS | 4 | 245
-All options - ARG_LEADING_ZEROS | 496| 737
-All options | 644| 885
+Configuration | Available args | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
+:---| :---: | :---: | :---:
+Base | just the string itself | 241 | 241
+ARG_HEX | %x | 122 | 363
+ARG_DECIMAL | %d | 168 | 409
+ARG_BINARY  |%b and %\_b | 71 | 312
+ARG_STRING | %s | 25 | 266
+ARG_CHAR | %c | 20 | 261
+ARG_HEX + ARG_LEADING_ZEROS | %0Nx and %Nx (0<N<10) | 250 | 491
+ARG_DECIMAL + ARG_LEADING_ZEROS | %0Nd and %Nd (0<N<10) | 298 | 539
+ARG_PTR | %p[xbdcs] | 32 | 273
+ESCAPED_HEX_LITERALS | \xNN | 63 | 304
+PRESERVE_REGS | | 4 | 245
+All options - ARG_LEADING_ZEROS | %x %b %d %c %s \xNN %p[xbdcs] | 496| 737
+All options | %x %b %d %c %s \xNN %p[xbdcs]<br>%0Nx %0Nd (0<N<10)<br>%Nx %Nd (0<N<10)| 644| 885
 
 When building for systems with available zero page locations, 26 bytes are moved from "DATA" to "ZEROPAGE" segment, further reducing the total size. Otherwise just three pointers (6 bytes) on the zeropage are required.
 
