@@ -171,7 +171,7 @@ The table belows shows the effects that various configuration options have on th
 
 Configuration | Binary size increase<br>[bytes] | Total binary size<br>[bytes]
 :---| :---: | :---:
-Base | 241 | 241
+Base (minimal usable) | 241 | 241
 ARG_HEX | 122 | 363
 ARG_DECIMAL | 168 | 409
 ARG_BINARY | 71 | 312
@@ -185,3 +185,4 @@ PRESERVE_REGS | 4 | 245
 All options - ARG_LEADING_ZEROS | 496| 737
 All options | 644| 885
 
+When building for systems with available zero page locations, 26 bytes are moved from "DATA" to "ZEROPAGE" segment, further reducing the total size.
