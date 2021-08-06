@@ -26,8 +26,9 @@ outputting: ```$2A = 42 dec```. Also this is possible:
 	printf "Pointer at $%04lx, pointing to string at $%04lx, which is \'%ps\'.\n", &ptr, ptr, ptr
 	rts
 text:	.byte "Hello, Underworld", 0
+ptr:	.word 0
 ```
-Output: ```Pointer at $0ce9, pointing to string at $0cd1, which is 'Hello, Underworld'.``` Finally,
+Output: ```Pointer at $0ce3, pointing to string at $0cd1, which is 'Hello, Underworld'.``` Finally,
 ```asm
 	ldx #2
 loop:	printf "Content of register X is $%02x\n", ^X
