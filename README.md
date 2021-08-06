@@ -59,6 +59,19 @@ Glad you asked. Your code is expected to define a macro called ```PRINTF_OUTPUT_
 
 Additionally, if macro ```PRINTF_INIT``` is defined, it will be executed at the start of ```_printf```. It could come handy if you need some values to be initialized at the start of every call. Again, see example2/ for a practical application.
 
+## Seems cool, how do I use it?
+
+* Make sure that your linker config has CODE, ZEROPAGE, DATA and RODATA segments.
+* Define PRINTF_OUTPUT_CHAR macro and make it visible in tiny_printf.s
+* Optionally define PRINTF_INIT
+* Make your code include tiny_printf.i (for macros)
+* Adjust configuration options in tiny_printf.s (unless you need want everything, which is the default)
+* Assemble tiny_printf.s and link it with your code. No point making it into a library, it's just one function.
+* Commence printfing. All your printf calls should be done from CODE segment.
+
+As usual, included examples are your best friends. Refer to them for build setup, macro definitions and usage examples.
+
+
 ### Is it like full printf, with floats, and precision, and a pony?
 
 Not really, but the list of supported format specifiers is quite comprehensive:
@@ -182,3 +195,11 @@ All options - ARG_LEADING_ZEROS | 496| 737
 All options | 644| 885
 
 When building for systems with available zero page locations, 26 bytes are moved from "DATA" to "ZEROPAGE" segment, further reducing the total size. Otherwise just three pointers (6 bytes) on the zeropage are required.
+
+## Wait, has it been tested?!
+
+There is some 50+ tests being run using sim6502 from cc65 whenever you type make. See test/ for details.
+
+## Great, no bugs then!
+
+lol
