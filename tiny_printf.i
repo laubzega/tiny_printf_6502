@@ -4,13 +4,13 @@
         .import _printf_register_x
         .import _printf_register_y
         .import _printf_register_pc
-        .import _printf_register_s
+        .import _printf_register_p
 .else
         .importzp _printf_register_a
         .importzp _printf_register_x
         .importzp _printf_register_y
         .importzp _printf_register_pc
-        .importzp _printf_register_s
+        .importzp _printf_register_p
 .endif
 
 .macro regpush r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15
@@ -54,16 +54,16 @@
                 .elseif (.xmatch (.right(.tcount ({r2})-1, {r2}), PC))
                     .segment "RODATA"
                     .word _printf_register_pc
-                .elseif (.xmatch (.right(.tcount ({r2})-1, {r2}), S))
+                .elseif (.xmatch (.right(.tcount ({r2})-1, {r2}), P))
                     .segment "RODATA"
-                    .word _printf_register_s
+                    .word _printf_register_p
                     .if .not (@s_stored)
                         @s_stored .set 1
                         .segment "CODE"
                         pha
                         php
                         pla
-                        sta _printf_register_s
+                        sta _printf_register_p
                         pla
                     .endif
                  .elseif (.strlen(.string(.right(.tcount({r2}) - 1, {r2}))) = 2)

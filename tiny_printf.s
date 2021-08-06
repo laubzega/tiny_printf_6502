@@ -4,7 +4,7 @@
         .export _printf_register_x
         .export _printf_register_y
         .export _printf_register_pc
-        .export _printf_register_s
+        .export _printf_register_p
 
         .include "tiny_printf_io.i"
 
@@ -36,7 +36,7 @@ _printf_register_a: .res 1
 _printf_register_x: .res 1
 _printf_register_y: .res 1
 _printf_register_pc: .res 2
-_printf_register_s: .res 1
+_printf_register_p: .res 1
 _printf_mode:       .res 1
 .ifdef _TINYPRINTF_SUPPORT_LEADING_ZEROS
 _printf_total_places: .res 1

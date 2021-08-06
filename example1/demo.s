@@ -51,7 +51,7 @@ deci4: .word $5555
 .endif
         ldx #$10
         printf "X(\%x)=$%x       ", ^X
-        printf "S(\%b)=\%%b\n", ^S
+        printf "S(\%b)=\%%b\n", ^P
         printf "PC(\%04lx)=$%04lx ", ^PC
         ldx #$BA
         ldy #$CA
